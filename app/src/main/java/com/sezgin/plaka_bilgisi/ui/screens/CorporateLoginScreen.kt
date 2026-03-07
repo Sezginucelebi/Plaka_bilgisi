@@ -113,7 +113,7 @@ fun CorporateLoginScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     TextButton(onClick = onBackClick) { Text("← Geri Dön") }
                 }
-                Text("ss yazılım", modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp), style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                Text("ss yazılım", modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp), style = MaterialTheme.typography.labelSmall, color = Color.Red)
             }
         }
     }
@@ -166,7 +166,7 @@ fun CorporateTerminalScreen(session: UserSessionData, onLogout: () -> Unit) {
         },
         bottomBar = {
             BottomAppBar(containerColor = Color.Transparent) {
-                Text("ss yazılım", modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                Text("ss yazılım", modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center, style = MaterialTheme.typography.labelSmall, color = Color.Red)
             }
         }
     ) { padding ->

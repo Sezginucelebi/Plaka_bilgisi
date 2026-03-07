@@ -2,7 +2,8 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsCompose)
-    alias(libs.plugins.kotlinCompose) // <--- Bu satır eklendi
+    alias(libs.plugins.kotlinCompose)
+    alias(libs.plugins.kotlinxSerialization)
 }
 
 kotlin {
@@ -15,10 +16,22 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
+                
+                implementation(libs.ktorClientCore)
+                implementation(libs.ktorClientContentNegotiation)
+                implementation(libs.ktorSerializationJson)
             }
         }
-        val androidMain by getting
-        val desktopMain by getting
+        val androidMain by getting {
+            dependencies {
+                implementation(libs.ktorClientOkhttp)
+            }
+        }
+        val desktopMain by getting {
+            dependencies {
+                implementation(libs.ktorClientCio)
+            }
+        }
     }
 }
 

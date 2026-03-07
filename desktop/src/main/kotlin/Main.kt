@@ -172,7 +172,7 @@ fun LoginView(hardwareId: String, onLoginSuccess: (UserSession) -> Unit) {
                 }
                 errorMessage?.let { Text(it, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 16.dp)) }
             }
-            Text("ss yazılım", modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp), fontSize = 12.sp, color = Color.Gray)
+            Text("ss yazılım", modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp), fontSize = 12.sp, color = Color.Red)
         }
     }
 
@@ -381,7 +381,7 @@ fun AdminTerminalScreen(session: UserSession, onLogout: () -> Unit) {
         }, 
         bottomBar = {
             BottomAppBar(backgroundColor = Color.Transparent, elevation = 0.dp) {
-                Text("ss yazılım", modifier = Modifier.fillMaxWidth().padding(8.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = 12.sp, color = Color.Gray)
+                Text("ss yazılım", modifier = Modifier.fillMaxWidth().padding(8.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = 12.sp, color = Color.Red)
             }
         }
     ) { padding ->
@@ -556,7 +556,7 @@ fun MainScreen(session: UserSession, onLogout: () -> Unit) {
         }
     }, bottomBar = {
         BottomAppBar(backgroundColor = Color.Transparent, elevation = 0.dp) {
-            Text("ss yazılım", modifier = Modifier.fillMaxWidth().padding(8.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = 12.sp, color = Color.Gray)
+            Text("ss yazılım", modifier = Modifier.fillMaxWidth().padding(8.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = 12.sp, color = Color.Red)
         }
     }) { padding ->
         if (currentTab == 0) VehicleTab(padding, session, vehicles, searchQuery, { searchQuery = it }, { isAddingVehicle = true }, { editingVehicle = it })
