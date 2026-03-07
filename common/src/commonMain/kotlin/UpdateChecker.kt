@@ -1,3 +1,5 @@
+package com.sezgin.plaka_bilgisi.util
+
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -23,16 +25,14 @@ class UpdateChecker {
 
     suspend fun checkForUpdates(currentVersion: String): String? {
         return try {
-            // Sezginucelebi/Plaka_bilgisi repository'sini kontrol eder
             val release: GitHubRelease = client.get("https://api.github.com/repos/Sezginucelebi/Plaka_bilgisi/releases/latest").body()
-            
             if (release.tag_name != currentVersion) {
-                release.html_url // Yeni versiyon varsa indirme linkini döner
+                release.html_url
             } else {
-                null // Versiyonlar aynı
+                null
             }
         } catch (e: Exception) {
-            null // Hata durumunda (internet yok vb.) sessizce geç
+            null
         }
     }
 }

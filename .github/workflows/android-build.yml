@@ -25,8 +25,8 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    # google-services.json dosyası eksikse build hata vermesin diye sahte dosya oluşturuyoruz
-    - name: Ensure Firebase config exists
+    # google-services.json dosyası GitHub'da yoksa hata vermemesi için
+    - name: Ensure Firebase config
       run: |
         mkdir -p app/
         if [ ! -f app/google-services.json ]; then
@@ -34,25 +34,17 @@ jobs:
         fi
 
     - name: Build Android APK (Debug)
-      run: ./gradlew :app:assembleDebug
+      run: ./gradlew :app:assembleDebug --stacktrace
       
-    - name: Build Desktop App
-      run: ./gradlew :desktop:package
-      
-    - name: Generate Version Tag
+    - name: Generate Tag
       id: tag
       run: echo "TAG_NAME=v1.0.${{ github.run_number }}" >> $GITHUB_OUTPUT
 
-    - name: Create GitHub Release
+    - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        files: |
-          app/build/outputs/apk/debug/*.apk
-          desktop/build/compose/binaries/main-release/msi/*.msi
-          desktop/build/compose/binaries/main-release/exe/*.exe
+        files: app/build/outputs/apk/debug/*.apk
         tag_name: ${{ steps.tag.outputs.TAG_NAME }}
         name: Auto Release ${{ steps.tag.outputs.TAG_NAME }}
-        draft: false
-        prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

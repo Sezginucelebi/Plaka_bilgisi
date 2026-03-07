@@ -27,8 +27,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.sezgin.plaka_bilgisi.model.Vehicle
 import com.sezgin.plaka_bilgisi.repository.*
-import UpdateChecker // Ortak modüldeki UpdateChecker
+import com.sezgin.plaka_bilgisi.util.UpdateChecker // Paket yolu düzeltildi
 import kotlinx.coroutines.launch
+import com.sezgin.plaka_bilgisi.BuildConfig
 
 @Composable
 fun CorporateLoginScreen(
@@ -47,13 +48,16 @@ fun CorporateLoginScreen(
     
     // Güncelleme Durumu
     var updateUrl by remember { mutableStateOf<String?>(null) }
-    val currentVersion = "v1.0.2" // Uygulamanın şu anki versiyonu
+    val currentVersion = "v${BuildConfig.VERSION_NAME}"
 
     LaunchedEffect(Unit) {
-        // Otomatik Güncelleme Kontrolü
         scope.launch {
-            val checker = UpdateChecker()
-            updateUrl = checker.checkForUpdates(currentVersion)
+            try {
+                val checker = UpdateChecker()
+                updateUrl = checker.checkForUpdates(currentVersion)
+            } catch (e: Exception) {
+                // Hata durumunda sessizce geç
+            }
         }
 
         val current = auth.currentUser
@@ -62,7 +66,6 @@ fun CorporateLoginScreen(
         }
     }
 
-    // Güncelleme Uyarısı (Dialog)
     updateUrl?.let { url ->
         AlertDialog(
             onDismissRequest = { updateUrl = null },
