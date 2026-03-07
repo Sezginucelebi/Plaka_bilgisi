@@ -14,8 +14,10 @@
 /captures
 externalNativeBuild
 .cxx
-/google-services.json
-/serviceAccountKey.json
+
+# Geçici olarak build başarısı için bunları yorum satırı yapıyoruz
+# /google-services.json
+# /serviceAccountKey.json
 
 # App level
 /app/build

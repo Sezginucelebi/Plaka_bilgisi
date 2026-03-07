@@ -27,9 +27,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.sezgin.plaka_bilgisi.model.Vehicle
 import com.sezgin.plaka_bilgisi.repository.*
-import UpdateChecker 
+import UpdateChecker // Ortak modüldeki UpdateChecker
 import kotlinx.coroutines.launch
-import com.sezgin.plaka_bilgisi.BuildConfig // Otomatik sürüm için eklendi
 
 @Composable
 fun CorporateLoginScreen(
@@ -48,17 +47,13 @@ fun CorporateLoginScreen(
     
     // Güncelleme Durumu
     var updateUrl by remember { mutableStateOf<String?>(null) }
-    // BuildConfig üzerinden otomatik sürüm çekme (başına 'v' ekliyoruz ki GitHub taglarıyla eşleşsin)
-    val currentVersion = "v${BuildConfig.VERSION_NAME}" 
+    val currentVersion = "v1.0.2" // Uygulamanın şu anki versiyonu
 
     LaunchedEffect(Unit) {
+        // Otomatik Güncelleme Kontrolü
         scope.launch {
-            try {
-                val checker = UpdateChecker()
-                updateUrl = checker.checkForUpdates(currentVersion)
-            } catch (e: Exception) {
-                // Hata durumunda sessizce devam et
-            }
+            val checker = UpdateChecker()
+            updateUrl = checker.checkForUpdates(currentVersion)
         }
 
         val current = auth.currentUser
@@ -67,6 +62,7 @@ fun CorporateLoginScreen(
         }
     }
 
+    // Güncelleme Uyarısı (Dialog)
     updateUrl?.let { url ->
         AlertDialog(
             onDismissRequest = { updateUrl = null },
@@ -213,6 +209,7 @@ fun CorporateTerminalScreen(session: UserSessionData, onLogout: () -> Unit) {
             OutlinedTextField(value = searchQuery, onValueChange = { searchQuery = it }, label = { Text("Arama...") }, modifier = Modifier.fillMaxWidth())
             Spacer(modifier = Modifier.height(16.dp))
             
+            // 🔥 DINAMIK TABLO BASLIKLARI
             Row(modifier = Modifier.fillMaxWidth().background(Color.LightGray.copy(alpha = 0.3f)).padding(8.dp)) {
                 if (session.enabledFields.contains("plate")) Text("PLAKA", Modifier.weight(1f), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
                 if (session.enabledFields.contains("ownerName")) Text("SAHİBİ", Modifier.weight(1.5f), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
