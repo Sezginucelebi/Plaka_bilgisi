@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build-android:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -25,26 +25,27 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    # google-services.json dosyası GitHub'da yoksa hata vermemesi için
+    # google-services.json dosyası GitHub'da yoksa build'i bozmasın diye düzeltilmiş dummy
     - name: Ensure Firebase config
       run: |
         mkdir -p app/
         if [ ! -f app/google-services.json ]; then
-          echo '{"project_info":{"project_id":"dummy"},"client":[{"client_info":{"mobilesdk_app_id":"1:0:android:dummy"},"api_key":[{"current_key":"dummy"}]}]}' > app/google-services.json
+          echo '{"project_info":{"project_id":"dummy-id"},"client":[{"client_info":{"mobilesdk_app_id":"1:0:android:com.sezgin.plaka_bilgisi"},"api_key":[{"current_key":"dummy-key"}]}]}' > app/google-services.json
         fi
 
     - name: Build Android APK (Debug)
       run: ./gradlew :app:assembleDebug --stacktrace
       
-    - name: Generate Tag
+    - name: Generate Tag Name
       id: tag
       run: echo "TAG_NAME=v1.0.${{ github.run_number }}" >> $GITHUB_OUTPUT
 
-    - name: Create Release
+    - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
         files: app/build/outputs/apk/debug/*.apk
         tag_name: ${{ steps.tag.outputs.TAG_NAME }}
         name: Auto Release ${{ steps.tag.outputs.TAG_NAME }}
+        body: "Otomatik oluşturulan Android APK sürümü."
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
