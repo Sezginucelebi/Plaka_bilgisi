@@ -15,13 +15,18 @@ android {
         applicationId = "com.sezgin.plaka_bilgisi"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
-        versionName = "2.0"
+        versionCode = 4
+        versionName = "1.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+    }
+
+    buildFeatures {
+        compose = true
+        buildConfig = true // Kod içinden sürüm okumak için açtık
     }
 
     buildTypes {
@@ -40,10 +45,6 @@ android {
         jvmTarget = "1.8"
     }
 
-    buildFeatures {
-        compose = true
-    }
-
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -52,6 +53,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":common"))
+
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
     implementation("androidx.activity:activity-compose:1.9.0")

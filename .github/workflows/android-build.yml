@@ -1,18 +1,19 @@
-name: Build and Release
+name: Auto Build and Release
 
 on:
   push:
-    tags:
-      - 'v*' # v1.0, v2.1.0 gibi bir tag atıldığında çalışır
+    branches: [ "main" ] # Sadece main branch'ine push yapıldığında çalışır
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Release oluşturmak için izin gerekir
+      contents: write
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Tüm geçmişi çek ki sürümleme yapılabilsin
     
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -24,20 +25,25 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       
-    - name: Build Android APK
-      run: ./gradlew :app:assembleRelease
+    - name: Build Android APK (Debug)
+      run: ./gradlew :app:assembleDebug
       
-    - name: Build Desktop App (MSI/EXE)
+    - name: Build Desktop App
       run: ./gradlew :desktop:package
       
+    - name: Generate Random Version Tag
+      id: tag
+      run: echo "TAG_NAME=v1.0.${{ github.run_number }}" >> $GITHUB_OUTPUT
+
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          app/build/outputs/apk/release/*.apk
+          app/build/outputs/apk/debug/*.apk
           desktop/build/compose/binaries/main-release/msi/*.msi
           desktop/build/compose/binaries/main-release/exe/*.exe
-        name: Release ${{ github.ref_name }}
+        tag_name: ${{ steps.tag.outputs.TAG_NAME }}
+        name: Auto Release ${{ steps.tag.outputs.TAG_NAME }}
         draft: false
         prerelease: false
       env:

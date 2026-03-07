@@ -1,5 +1,7 @@
 package com.sezgin.plaka_bilgisi.ui.screens
 
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -25,6 +27,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.sezgin.plaka_bilgisi.model.Vehicle
 import com.sezgin.plaka_bilgisi.repository.*
+import UpdateChecker 
+import kotlinx.coroutines.launch
+import com.sezgin.plaka_bilgisi.BuildConfig // Otomatik sürüm için eklendi
 
 @Composable
 fun CorporateLoginScreen(
@@ -32,18 +37,52 @@ fun CorporateLoginScreen(
     onBackClick: () -> Unit
 ) {
     val auth = FirebaseAuth.getInstance()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var userSession by remember { mutableStateOf<UserSessionData?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    
+    // Güncelleme Durumu
+    var updateUrl by remember { mutableStateOf<String?>(null) }
+    // BuildConfig üzerinden otomatik sürüm çekme (başına 'v' ekliyoruz ki GitHub taglarıyla eşleşsin)
+    val currentVersion = "v${BuildConfig.VERSION_NAME}" 
 
     LaunchedEffect(Unit) {
+        scope.launch {
+            try {
+                val checker = UpdateChecker()
+                updateUrl = checker.checkForUpdates(currentVersion)
+            } catch (e: Exception) {
+                // Hata durumunda sessizce devam et
+            }
+        }
+
         val current = auth.currentUser
         if (current != null) {
             fetchUserSession(current.uid) { session -> userSession = session }
         }
+    }
+
+    updateUrl?.let { url ->
+        AlertDialog(
+            onDismissRequest = { updateUrl = null },
+            title = { Text("Yeni Güncelleme Mevcut!") },
+            text = { Text("Uygulamanın yeni bir sürümü bulundu. İndirip kurmak ister misiniz?") },
+            confirmButton = {
+                Button(onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    context.startActivity(intent)
+                    updateUrl = null
+                }) { Text("Şimdi İndir") }
+            },
+            dismissButton = {
+                TextButton(onClick = { updateUrl = null }) { Text("Daha Sonra") }
+            }
+        )
     }
 
     if (userSession != null) {
@@ -174,7 +213,6 @@ fun CorporateTerminalScreen(session: UserSessionData, onLogout: () -> Unit) {
             OutlinedTextField(value = searchQuery, onValueChange = { searchQuery = it }, label = { Text("Arama...") }, modifier = Modifier.fillMaxWidth())
             Spacer(modifier = Modifier.height(16.dp))
             
-            // 🔥 DINAMIK TABLO BASLIKLARI
             Row(modifier = Modifier.fillMaxWidth().background(Color.LightGray.copy(alpha = 0.3f)).padding(8.dp)) {
                 if (session.enabledFields.contains("plate")) Text("PLAKA", Modifier.weight(1f), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
                 if (session.enabledFields.contains("ownerName")) Text("SAHİBİ", Modifier.weight(1.5f), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
