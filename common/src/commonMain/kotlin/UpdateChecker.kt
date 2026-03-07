@@ -5,6 +5,7 @@ import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -22,7 +23,6 @@ class UpdateChecker {
                 ignoreUnknownKeys = true
             })
         }
-        // GitHub API için User-Agent zorunludur
         defaultRequest {
             header("User-Agent", "PlakaBilgisi-App")
         }
@@ -30,15 +30,21 @@ class UpdateChecker {
 
     suspend fun checkForUpdates(currentVersion: String): String? {
         return try {
-            val release: GitHubRelease = client.get("https://api.github.com/repos/Sezginucelebi/Plaka_bilgisi/releases/latest").body()
-            // Sürüm karşılaştırması (v1.0.6 != v1.0.5 gibi)
-            if (release.tag_name != currentVersion) {
-                release.html_url
+            val response: HttpResponse = client.get("https://api.github.com/repos/Sezginucelebi/Plaka_bilgisi/releases/latest")
+            
+            if (response.status.value == 200) {
+                val release: GitHubRelease = response.body()
+                // Gelen sürümü ve mevcut sürümü loglayalım (Hata mesajında görünecek)
+                if (release.tag_name != currentVersion) {
+                    release.html_url
+                } else {
+                    null
+                }
             } else {
-                null
+                throw Exception("GitHub Hatası: ${response.status.description} (${response.status.value})")
             }
         } catch (e: Exception) {
-            null
+            throw Exception("Bağlantı Başarısız: ${e.message}")
         }
     }
 }

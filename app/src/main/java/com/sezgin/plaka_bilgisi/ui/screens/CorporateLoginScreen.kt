@@ -27,9 +27,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.sezgin.plaka_bilgisi.model.Vehicle
 import com.sezgin.plaka_bilgisi.repository.*
-import com.sezgin.plaka_bilgisi.util.UpdateChecker // Paket yolu düzeltildi
+import com.sezgin.plaka_bilgisi.util.UpdateChecker
 import kotlinx.coroutines.launch
 import com.sezgin.plaka_bilgisi.BuildConfig
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
 
 @Composable
 fun CorporateLoginScreen(
@@ -48,15 +50,23 @@ fun CorporateLoginScreen(
     
     // Güncelleme Durumu
     var updateUrl by remember { mutableStateOf<String?>(null) }
-    val currentVersion = "v${BuildConfig.VERSION_NAME}"
+    
+    // 🔥 GERÇEK SÜRÜM: Artık otomatik olarak sistemden alıyoruz
+    val currentVersion = "v${BuildConfig.VERSION_NAME}" 
 
     LaunchedEffect(Unit) {
         scope.launch {
             try {
                 val checker = UpdateChecker()
-                updateUrl = checker.checkForUpdates(currentVersion)
+                val result = checker.checkForUpdates(currentVersion)
+                
+                withContext(Dispatchers.Main) {
+                    if (result != null) {
+                        updateUrl = result
+                    }
+                }
             } catch (e: Exception) {
-                // Hata durumunda sessizce geç
+                // Hata durumunda log basılabilir, kullanıcıya yansıtmayalım
             }
         }
 
