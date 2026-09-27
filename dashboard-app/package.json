@@ -1,0 +1,13 @@
+{
+  "name": "auronova-dashboard",
+  "version": "1.0.0",
+  "description": "AuroNova Plaka Takibi Yönetim Paneli",
+  "author": "AuroNova Software",
+  "main": "main.js",
+  "dependencies": {
+    "axios": "^1.6.8",
+    "firebase-admin": "^12.1.0",
+    "qrcode": "^1.5.4",
+    "xlsx": "^0.18.5"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "758281889315",
+    "project_id": "plaka-sorgulama-e57fb",
+    "storage_bucket": "plaka-sorgulama-e57fb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:758281889315:android:b09fd0bbee5d6a4027f396",
+        "android_client_info": {
+          "package_name": "com.sezgin.plaka_bilgisi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWh-HsV4kR5gyAHR6Jy3xrFXG2XG_Gto0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

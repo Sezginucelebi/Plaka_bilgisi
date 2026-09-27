@@ -19,6 +19,16 @@ externalNativeBuild
 # /google-services.json
 # /serviceAccountKey.json
 
+# Credentials and locally generated tooling output
+serviceAccountKey.json
+**/serviceAccountKey.json
+/.artifacts/
+/**/.artifacts/
+/.vscode/
+/dashboard-app/node_modules/
+/dashboard-app/dist/
+/desktop/bin/
+
 # App level
 /app/build
 /common/build

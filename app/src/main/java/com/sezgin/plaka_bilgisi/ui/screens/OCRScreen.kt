@@ -8,9 +8,16 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -22,9 +29,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -37,7 +46,7 @@ import java.util.concurrent.Executors
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun OCRScreen(onPlateDetected: (String) -> Unit) {
+fun OCRScreen(onPlateDetected: (String) -> Unit, onBack: () -> Unit = {}) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val permissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
@@ -112,24 +121,40 @@ fun OCRScreen(onPlateDetected: (String) -> Unit) {
                 modifier = Modifier.fillMaxSize()
             )
 
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxWidth(0.78f)
+                    .height(170.dp)
+                    .border(3.dp, Color(0xFF9A7BDF), RoundedCornerShape(18.dp))
+            )
+
             Surface(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .padding(24.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
-                shape = MaterialTheme.shapes.medium
+                color = Color(0xEE101722),
+                shape = RoundedCornerShape(24.dp)
             ) {
-                Text(
-                    text = "Tespit Edilen: $detectedText",
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.titleMedium
-                )
+                Column(modifier = Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("PLAKA TARANIYOR", color = Color(0xFF66A7FF), fontSize = 13.sp)
+                    Spacer(Modifier.height(8.dp))
+                    Text(detectedText, style = MaterialTheme.typography.titleLarge)
+                    Spacer(Modifier.height(16.dp))
+                    Button(onClick = onBack, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3582F4))) {
+                        Text("MANUEL KAYIT MODUNA GEÇ")
+                    }
+                }
             }
         }
     } else {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Kamera izni gerekiyor.")
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Kamera izni gerekiyor.")
+                Spacer(Modifier.height(12.dp))
+                Button(onClick = onBack) { Text("GERİ DÖN") }
+            }
         }
     }
 }

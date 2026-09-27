@@ -276,20 +276,69 @@ fun CorporateTerminalScreen(session: UserSessionData, onLogout: () -> Unit) {
 @Composable
 fun VehicleDynamicDialog(title: String, initialVehicle: Vehicle, fields: List<String>, onDismiss: () -> Unit, onConfirm: (Vehicle) -> Unit) {
     var v by remember { mutableStateOf(initialVehicle) }
+    val context = LocalContext.current
+    val activeFields = if (fields.isEmpty()) listOf("plate", "brand", "ownerName", "block", "apartment", "floor", "phone") else fields
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (fields.contains("plate")) OutlinedTextField(value = v.plate, onValueChange = { v = v.copy(plate = it.uppercase()) }, label = { Text("Plaka") })
-                if (fields.contains("ownerName")) OutlinedTextField(value = v.ownerName, onValueChange = { v = v.copy(ownerName = it) }, label = { Text("Araç Sahibi") })
-                if (fields.contains("block")) OutlinedTextField(value = v.block, onValueChange = { v = v.copy(block = it) }, label = { Text("Blok") })
-                if (fields.contains("apartment")) OutlinedTextField(value = v.apartment, onValueChange = { v = v.copy(apartment = it) }, label = { Text("Daire") })
-                if (fields.contains("floor")) OutlinedTextField(value = v.floor, onValueChange = { v = v.copy(floor = it) }, label = { Text("Kat") })
-                if (fields.contains("phone")) OutlinedTextField(value = v.phone, onValueChange = { v = v.copy(phone = it) }, label = { Text("Telefon") })
+                activeFields.forEach { field ->
+                    when (field) {
+                        "plate" -> OutlinedTextField(
+                            value = v.plate,
+                            onValueChange = { v = v.copy(plate = it.uppercase()) },
+                            label = { Text("Plaka") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        "brand" -> BrandInputField(
+                            brand = v.brand,
+                            onBrandChange = { v = v.copy(brand = it) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        "ownerName" -> OutlinedTextField(
+                            value = v.ownerName,
+                            onValueChange = { v = v.copy(ownerName = it) },
+                            label = { Text("Araç Sahibi") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        "block" -> OutlinedTextField(
+                            value = v.block,
+                            onValueChange = { v = v.copy(block = it) },
+                            label = { Text("Blok") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        "apartment" -> OutlinedTextField(
+                            value = v.apartment,
+                            onValueChange = { v = v.copy(apartment = it) },
+                            label = { Text("Daire") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        "floor" -> OutlinedTextField(
+                            value = v.floor,
+                            onValueChange = { v = v.copy(floor = it) },
+                            label = { Text("Kat") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        "phone" -> OutlinedTextField(
+                            value = v.phone,
+                            onValueChange = { v = v.copy(phone = it.trim()) },
+                            label = { Text("Dahili") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
             }
         },
-        confirmButton = { Button(onClick = { onConfirm(v) }) { Text("Kaydet") } },
+        confirmButton = { 
+            Button(onClick = { 
+                if (v.brand.isNotBlank()) {
+                    saveBrandToPreferences(context, v.brand)
+                }
+                onConfirm(v) 
+            }) { Text("Kaydet") } 
+        },
         dismissButton = { TextButton(onClick = onDismiss) { Text("İptal") } }
     )
 }

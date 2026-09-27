@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -50,20 +51,19 @@ fun EntryScreen(
                     .padding(bottom = 20.dp)
             )
 
-            // 🔹 Başlık
             Text(
-                text = "",
+                text = "AuroNova",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 26.sp
+                    fontSize = 30.sp
                 ),
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
             // 🔹 Alt başlık
             Text(
-                text = "Giriş türünüzü seçin",
-                style = MaterialTheme.typography.bodyLarge,
+                text = "PTS TERMINAL SİSTEMİ",
+                style = MaterialTheme.typography.bodyLarge.copy(color = Color(0xFF66A7FF), fontWeight = FontWeight.Bold, letterSpacing = 2.sp),
                 modifier = Modifier.padding(bottom = 30.dp)
             )
 
@@ -76,7 +76,7 @@ fun EntryScreen(
                     .height(56.dp)
             ) {
                 Text(
-                    text = "Bireysel Giriş",
+                    text = "PERSONEL GİRİŞİ",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -94,7 +94,7 @@ fun EntryScreen(
                 border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.5.dp)
             ) {
                 Text(
-                    text = "Kurumsal Giriş",
+                    text = "KURUMSAL GİRİŞ",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -104,7 +104,7 @@ fun EntryScreen(
 
             // 🔹 Bilgilendirme metni
             Text(
-                text = "Kurumsal hesaplar ek güvenlik (SMS + Şifre) ile korunur.",
+                text = "Giriş türünüzü seçerek devam edin.",
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 ),

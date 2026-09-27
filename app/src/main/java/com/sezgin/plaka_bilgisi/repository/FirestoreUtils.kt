@@ -10,33 +10,50 @@ fun addVehicleToFirestore(
 ) {
     val db = FirebaseFirestore.getInstance()
     
-    val vehicleMap = hashMapOf(
-        "plate" to vehicle.plate,
-        "ownerName" to vehicle.ownerName,
-        "block" to vehicle.block,
-        "apartment" to vehicle.apartment,
-        "floor" to vehicle.floor,
-        "phone" to vehicle.phone,
-        "ownerId" to vehicle.ownerId,
-        "recordedBy" to vehicle.recordedBy,
-        "brand" to vehicle.brand,
-        "model" to vehicle.model
-    )
+    val resolveOwnerAndSave = { finalOwnerId: String ->
+        val updatedVehicle = vehicle.copy(ownerId = finalOwnerId)
+        val vehicleMap = hashMapOf(
+            "plate" to updatedVehicle.plate,
+            "ownerName" to updatedVehicle.ownerName,
+            "block" to updatedVehicle.block,
+            "apartment" to updatedVehicle.apartment,
+            "floor" to updatedVehicle.floor,
+            "phone" to updatedVehicle.phone,
+            "ownerId" to updatedVehicle.ownerId,
+            "recordedBy" to updatedVehicle.recordedBy,
+            "brand" to updatedVehicle.brand,
+            "model" to updatedVehicle.model
+        )
 
-    db.collection("vehicles")
-        .whereEqualTo("plate", vehicle.plate)
-        .whereEqualTo("ownerId", vehicle.ownerId) // Sadece aynı firma içinde mükerrer kontrolü
-        .get()
-        .addOnSuccessListener { result ->
-            if (result.isEmpty) {
-                db.collection("vehicles").add(vehicleMap)
-                    .addOnSuccessListener { onSuccess() }
-                    .addOnFailureListener { onFailure(it) }
-            } else {
-                onFailure(Exception("Bu plaka bu firmada zaten kayıtlı!"))
+        db.collection("vehicles")
+            .whereEqualTo("plate", updatedVehicle.plate)
+            .whereEqualTo("ownerId", updatedVehicle.ownerId) // Sadece aynı firma içinde mükerrer kontrolü
+            .get()
+            .addOnSuccessListener { result ->
+                if (result.isEmpty) {
+                    db.collection("vehicles").add(vehicleMap)
+                        .addOnSuccessListener { onSuccess() }
+                        .addOnFailureListener { onFailure(it) }
+                } else {
+                    onFailure(Exception("Bu plaka bu firmada zaten kayıtlı!"))
+                }
             }
-        }
-        .addOnFailureListener { onFailure(it) }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+    if (vehicle.ownerId.isNotBlank()) {
+        db.collection("users").document(vehicle.ownerId).get()
+            .addOnSuccessListener { doc ->
+                val parentId = doc.getString("parentId")
+                val finalOwnerId = if (!parentId.isNullOrBlank()) parentId else vehicle.ownerId
+                resolveOwnerAndSave(finalOwnerId)
+            }
+            .addOnFailureListener {
+                resolveOwnerAndSave(vehicle.ownerId)
+            }
+    } else {
+        resolveOwnerAndSave(vehicle.ownerId)
+    }
 }
 
 fun updateVehicleInFirestore(
@@ -65,16 +82,35 @@ fun updateVehicleInFirestore(
 
 fun getVehiclesForUser(userId: String, onSuccess: (List<Vehicle>) -> Unit, onFailure: (Exception) -> Unit) {
     val db = FirebaseFirestore.getInstance()
-    db.collection("vehicles")
-        .whereEqualTo("ownerId", userId)
-        .get()
-        .addOnSuccessListener { result ->
-            val vehicles = result.mapNotNull { doc -> 
-                doc.toObject(Vehicle::class.java).apply { id = doc.id } 
-            }
-            onSuccess(vehicles)
+    
+    db.collection("users").document(userId).get()
+        .addOnSuccessListener { doc ->
+            val parentId = doc.getString("parentId")
+            val targetOwnerId = if (!parentId.isNullOrBlank()) parentId else userId
+
+            db.collection("vehicles")
+                .whereEqualTo("ownerId", targetOwnerId)
+                .get()
+                .addOnSuccessListener { result ->
+                    val vehicles = result.mapNotNull { vehicleDoc -> 
+                        vehicleDoc.toObject(Vehicle::class.java).apply { id = vehicleDoc.id } 
+                    }
+                    onSuccess(vehicles)
+                }
+                .addOnFailureListener { onFailure(it) }
         }
-        .addOnFailureListener { onFailure(it) }
+        .addOnFailureListener {
+            db.collection("vehicles")
+                .whereEqualTo("ownerId", userId)
+                .get()
+                .addOnSuccessListener { result ->
+                    val vehicles = result.mapNotNull { vehicleDoc -> 
+                        vehicleDoc.toObject(Vehicle::class.java).apply { id = vehicleDoc.id } 
+                    }
+                    onSuccess(vehicles)
+                }
+                .addOnFailureListener { onFailure(it) }
+        }
 }
 
 fun getAllVehicles(onSuccess: (List<Vehicle>) -> Unit, onFailure: (Exception) -> Unit) {
@@ -164,8 +200,23 @@ data class UserProfile(
     val email: String = "",
     val role: String = "user",
     val isPremium: Boolean = false,
-    val enabledFields: List<String> = emptyList()
+    val enabledFields: List<String> = emptyList(),
+    val firmCode: String = "",
+    val maxVehicles: Int = 10,
+    val plan: String = "Free",
+    val expiryDate: String = ""
 )
+
+fun getVehicleCount(userId: String, onResult: (Int) -> Unit) {
+    val db = FirebaseFirestore.getInstance()
+    db.collection("vehicles")
+        .whereEqualTo("ownerId", userId)
+        .get()
+        .addOnSuccessListener { result ->
+            onResult(result.size())
+        }
+        .addOnFailureListener { onResult(0) }
+}
 
 fun getAllUsers(onSuccess: (List<UserProfile>) -> Unit, onFailure: (Exception) -> Unit) {
     val db = FirebaseFirestore.getInstance()

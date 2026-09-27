@@ -8,14 +8,16 @@
 
     <!-- 🌙 Normal uygulama teması -->
     <style name="Theme.Plaka_Bilgisi" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="colorPrimary">#3582F4</item>
+        <item name="colorSecondary">#66A7FF</item>
+        <item name="android:statusBarColor">#0C1018</item>
+        <item name="android:navigationBarColor">#0C1018</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
     <!-- ⚡ Android 12+ sistem splash screen teması -->
     <style name="Theme.Plaka_Bilgisi.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground" type="color">#FFFFFF</item>
+        <item name="windowSplashScreenBackground" type="color">#0C1018</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_logo</item>
         <item name="postSplashScreenTheme">@style/Theme.Plaka_Bilgisi</item>
         <item name="windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
